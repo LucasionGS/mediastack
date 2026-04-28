@@ -78,6 +78,7 @@ zfs set atime=off mediapool
 zfs set mountpoint=/media mediapool
 
 # Create the data folders
+zfs create mediapool/other
 zfs create mediapool/tv
 zfs create mediapool/movies
 zfs create mediapool/music
@@ -86,7 +87,7 @@ zfs create mediapool/downloads
 
 Option 2 - Create the data folders without ZFS (Less recommended):
 ```bash
-mkdir -p /media/mediapool/{tv,movies,music,downloads}
+mkdir -p /media/mediapool/{other,tv,movies,music,downloads}
 ```
 
 ### 3. Spin up
