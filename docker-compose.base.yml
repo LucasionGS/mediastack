@@ -13,6 +13,7 @@ services:
       - PLEX_CLAIM=${PLEX_CLAIM}
     volumes:
       - ${CONFIG_DIR}/plex:/config
+      - ${MEDIA_DIR}/other:/other
       - ${MEDIA_DIR}/tv:/tv
       - ${MEDIA_DIR}/movies:/movies
       - ${MEDIA_DIR}/music:/music
