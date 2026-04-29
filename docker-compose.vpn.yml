@@ -39,6 +39,3 @@ services:
       - ${DOWNLOAD_DIR}:/downloads
     depends_on:
       - gluetun
-    # Disable Traefik for qbittorrent since it's accessed through gluetun's IP
-    labels:
-      - "traefik.enable=false"
