@@ -2,15 +2,17 @@
 
 ## Stack
 
-| Service | Purpose | Port |
-| --- | --- | --- |
-| Plex | Media server | host networking |
-| Sonarr | TV show automation | 8989 |
-| Radarr | Movie automation | 7878 |
-| Prowlarr | Indexer manager | 9696 |
-| qBittorrent | Download client | 8080 |
-| Bazarr | Subtitle downloader | 6767 |
-| Overseerr | Request portal | 5055 |
+| Service | Purpose | Port | Domain variable |
+| --- | --- | --- | --- |
+| Traefik | Reverse proxy | 80 | n/a |
+| Plex | Media server | host networking | `DOMAIN_PLEX` |
+| Sonarr | TV show automation | 8989 | `DOMAIN_SONARR` |
+| Radarr | Movie automation | 7878 | `DOMAIN_RADARR` |
+| Whisparr | Movie automation | 6969 | `DOMAIN_WHISPARR` |
+| Prowlarr | Indexer manager | 9696 | `DOMAIN_PROWLARR` |
+| qBittorrent | Download client | 8080 | `DOMAIN_QBITTORRENT` |
+| Bazarr | Subtitle downloader | 6767 | `DOMAIN_BAZARR` |
+| Seerr | Request portal | 5055 | `DOMAIN_SEERR` |
 
 ## Setup
 
@@ -48,11 +50,14 @@ Fill in:
 - `TZ` — your timezone
 - `PLEX_CLAIM` — from <https://www.plex.tv/claim>
 - `MEDIA_DIR` — your ZFS pool mountpoint (e.g. /media/mediapool)
+- `DOMAIN` and `DOMAIN_*` — the domains Traefik should route to each service
+
+Create DNS records for each `DOMAIN_*` value that point to the Docker host. Traefik listens on HTTP port 80 and routes requests by hostname.
 
 ### 2. Create directories
 
 ```bash
-mkdir -p /opt/mediastack/config/{plex,sonarr,radarr,prowlarr,qbittorrent,bazarr,overseerr}
+mkdir -p /opt/mediastack/config/{plex,sonarr,radarr,prowlarr,qbittorrent,bazarr,seerr}
 ```
 
 Option 1 - Create the data folders using ZFS datasets, ideally using raid like:
@@ -122,17 +127,17 @@ SERVER_REGIONS=Netherlands
 docker compose -f docker-compose.vpn.yml up -d
 ```
 
-**Note:** When using VPN, all of `qbittorrent`'s traffic proxies through `gluetun`, so when you have to refer to `qbittorrent` regarding port traffic such as configurations pointing to the `qbittorrent:8080` host, you should use `gluetun:8080` instead
+**Note:** When using VPN, all of `qbittorrent`'s traffic proxies through `gluetun`. The `DOMAIN_QBITTORRENT` Traefik route is attached to `gluetun` in VPN mode, and any internal configuration that would normally point to `qbittorrent:8080` should use `gluetun:8080` instead.
 
 ### 4. Configure (in order)
 
-1. **Prowlarr** (`:9696`) — add your indexers
-2. **qBittorrent** (`:8080`) — note the temp password from logs: `docker logs qbittorrent`
-3. **Sonarr** (`:8989`) — add qBittorrent as download client, connect Prowlarr
-4. **Radarr** (`:7878`) — same as Sonarr
-5. **Bazarr** (`:6767`) — link Sonarr + Radarr, add subtitle providers
+1. **Prowlarr** (`DOMAIN_PROWLARR` or `:9696`) — add your indexers
+2. **qBittorrent** (`DOMAIN_QBITTORRENT` or `:8080`) — note the temp password from logs: `docker logs qbittorrent`
+3. **Sonarr** (`DOMAIN_SONARR` or `:8989`) — add qBittorrent as download client, connect Prowlarr
+4. **Radarr** (`DOMAIN_RADARR` or `:7878`) — same as Sonarr
+5. **Bazarr** (`DOMAIN_BAZARR` or `:6767`) — link Sonarr + Radarr, add subtitle providers
 6. **Plex** — add libraries pointing to /tv, /movies, /music
-7. **Overseerr** (`:5055`) — link to Plex, then Sonarr + Radarr
+7. **Seerr** (`DOMAIN_SEERR` or `:5055`) — link to Plex, then Sonarr + Radarr
 
 ## Important: Hardlinks
 

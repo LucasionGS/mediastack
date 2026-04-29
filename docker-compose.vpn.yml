@@ -18,6 +18,11 @@ services:
       - 8080:8080  # qBittorrent WebUI
       - 6881:6881
       - 6881:6881/udp
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qbittorrent.rule=Host(`${DOMAIN_QBITTORRENT:-qbit.${DOMAIN:-example.com}}`)"
+      - "traefik.http.routers.qbittorrent.entrypoints=web"
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
 
   # ─── qBittorrent (Download Client) ───────────────────────────────
   qbittorrent:
@@ -34,3 +39,6 @@ services:
       - ${DOWNLOAD_DIR}:/downloads
     depends_on:
       - gluetun
+    # Disable Traefik for qbittorrent since it's accessed through gluetun's IP
+    labels:
+      - "traefik.enable=false"
