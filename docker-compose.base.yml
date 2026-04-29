@@ -124,20 +124,6 @@ services:
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
     restart: unless-stopped
 
-  # ─── qBittorrent (Download Client) ───────────────────────────────
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - WEBUI_PORT=8080
-    volumes:
-      - ${CONFIG_DIR}/qbittorrent:/config
-      - ${DOWNLOAD_DIR}:/downloads
-    restart: unless-stopped
-
   # ─── Bazarr (Subtitles) ──────────────────────────────────────────
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
